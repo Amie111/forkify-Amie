@@ -9,6 +9,7 @@ export const state = {
     results: [],
     page: 1,
     resultsPerPage: RESULTS_PER_PAGE,
+    sortOrder: 'desc',
   },
   bookmarks: [],
 };
@@ -28,6 +29,19 @@ const creatRecipedata = function (loaddata) {
     ingredients: recipe.ingredients,
     ...(recipe.key && { key: recipe.key }), //当上传后取得的recipe有key，就将key属性设置为recipe.key
   };
+};
+
+// 创建一个函数用来给搜索结果默认按照ingredientsCount降序排序，并返回排序后的结果
+export const sortResults = function (
+  results = state.search.results,
+  order = 'desc'
+) {
+  const sortResults = [...results].sort((a, b) => {
+    return order === 'desc'
+      ? b.ingredientsCount - a.ingredientsCount
+      : a.ingredientsCount - b.ingredientsCount;
+  });
+  return sortResults;
 };
 
 // 用id获取recipe的数据，并存储到state对象中的recipe里
@@ -54,17 +68,28 @@ export const loadSearchResults = async function (query) {
     const data = await AJAX(`${API_URL}?search=${query}&key=${KEY}`);
     // 如果搜索出来的结果为空，则扔出一个错误一直传导到界面上
     if (!data || data.results === 0) throw new Error();
-    // 如果有结果，那就将结果存入state中，以便view调用
-    state.search.results = data.data.recipes.map(res => {
-      return {
-        id: res.id,
-        image: res.image_url,
-        publisher: res.publisher,
-        title: res.title,
-        ...(res.key && { key: res.key }), //同样，搜索时，如果有上传的recipe也把他的key取下来
-      };
-    });
+
+    // Load full recipe data to get ingredient counts
+    const recipesWithIngredients = await Promise.all(
+      data.data.recipes.map(async res => {
+        try {
+          const fullRecipe = await AJAX(`${API_URL}${res.id}?key=${KEY}`);
+          return {
+            id: res.id,
+            image: res.image_url,
+            publisher: res.publisher,
+            title: res.title,
+            ...(res.key && { key: res.key }), //同样，搜索时，如果有上传的recipe也把他的key取下来
+            ingredientsCount: fullRecipe.data.recipe.ingredients.length,
+          };
+        } catch (err) {
+          throw err;
+        }
+      })
+    );
+    state.search.results = sortResults(recipesWithIngredients, 'desc');
     state.search.page = 1;
+    state.search.sortOrder = 'desc';
   } catch (err) {
     throw err;
   }
