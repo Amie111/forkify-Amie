@@ -117,6 +117,20 @@ const controlAddRecipe = async function (recipe) {
   }
 };
 
+const controlSort = function (sortOrder) {
+  // 1)更新state中的search.results
+  model.state.search.results = model.sortResults(
+    model.state.search.results,
+    sortOrder
+  );
+  console.log(sortOrder);
+  // 2)显示新的搜索结果
+  ResultsView.render({
+    results: model.getSearchResultsPage(),
+    sortOrder: model.state.search.sortOrder,
+  });
+};
+
 // subscriber
 const init = function () {
   AddRecipeView.addHandlerUpload(controlAddRecipe);
@@ -126,6 +140,7 @@ const init = function () {
   RecipeView.addHandlerUpdateServings(controlUpdateServings);
   RecipeView.addHandlerBookmark(controlAddBookmark);
   SearchView.addHandlerSearch(controlSearchResults);
+  ResultsView.addHandlerSort(controlSort);
   PaginationView.addHandlerPagination(contorlPagination);
 };
 init();
