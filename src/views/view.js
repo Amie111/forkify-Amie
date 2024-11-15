@@ -80,6 +80,22 @@ export default class View {
     this._parentElement.insertAdjacentHTML('afterbegin', markup);
   }
 
+  renderValidateError(message) {
+    const markup = `
+        <div class="error">
+                <div>
+                  <svg>
+                    <use href="${icons}#icon-alert-triangle"></use>
+                  </svg>
+                </div>
+                <p>${message}</p>
+              </div>`;
+    if (this._window.querySelectorAll('.error').length !== 0) {
+      this._window.querySelector('.error').remove();
+    }
+    this._window.insertAdjacentHTML('afterbegin', markup);
+  }
+
   renderMessage(message = this._message) {
     const markup = `
         <div class="message">

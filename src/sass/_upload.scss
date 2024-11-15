@@ -47,6 +47,17 @@
   grid-template-columns: 1fr 1fr;
   gap: 4rem 6rem;
 
+  .error-container {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background-color: #ffd7d7;
+    color: #d63301;
+    border-radius: 4px;
+    margin-bottom: 2rem;
+    text-align: center;
+    grid-column: 1 / -1;
+  }
+
   &__column {
     display: grid;
     grid-template-columns: 1fr 2.8fr;
