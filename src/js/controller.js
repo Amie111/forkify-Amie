@@ -105,9 +105,13 @@ const controlAddRecipe = async function (recipe) {
     BookmarksView.render(model.state.bookmarks);
     // 显示上传成功的message
     AddRecipeView.renderMessage();
-    //  定时关闭输入窗口
+    // 定时关闭输入窗口
     setTimeout(function () {
       AddRecipeView.toggleWindow();
+    }, RECIPE_WINDOW_SEC * 2000);
+    // 重置网页
+    setTimeout(function () {
+      location.reload();
     }, RECIPE_WINDOW_SEC * 1000);
 
     // 让浏览器记住当前上传数据的id

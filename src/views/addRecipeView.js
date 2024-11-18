@@ -28,8 +28,14 @@ class AddRecipeView extends View {
 
   //   当点击window上的“关闭按钮”和“遮盖层”时，关闭window和覆盖层（此时要将toggleWindow函数的this关键词用bind指向“关闭按钮”和“遮盖层”）
   addHandlerCloseWindow() {
-    this._btnClose.addEventListener('click', this.toggleWindow.bind(this));
-    this._overlay.addEventListener('click', this.toggleWindow.bind(this));
+    this._btnClose.addEventListener('click', e => {
+      this.toggleWindow();
+      location.reload();
+    });
+    this._overlay.addEventListener('click', e => {
+      this.toggleWindow();
+      location.reload();
+    });
   }
 
   // 验证ingredients输入格式
