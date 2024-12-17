@@ -106,7 +106,7 @@ class RecipeView extends View {
               ? `
              <button class="btn--round btn--delete">
                <svg>
-                 <use href="${icons}#icon-minus-circle"></use>
+                 <use href="${icons}#icon-x-circle"></use>
                </svg>
              </button>
            `

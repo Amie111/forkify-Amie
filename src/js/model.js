@@ -166,7 +166,6 @@ export const deleteRecipe = async function (id) {
     if (!res.ok) {
       throw new Error(`Failed to delete recipe (${res.status})`);
     }
-
     return true;
   } catch (err) {
     throw err;
