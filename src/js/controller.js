@@ -121,6 +121,41 @@ const controlAddRecipe = async function (recipe) {
   }
 };
 
+const controlDeleteRecipe = async function () {
+  try {
+    // 1. Delete from API
+    await model.deleteRecipe(model.state.recipe.id);
+
+    // 2. Remove from search results if present
+    const index = model.state.search.results.findIndex(
+      recipe => recipe.id === model.state.recipe.id
+    );
+    if (index > -1) {
+      model.state.search.results.splice(index, 1);
+    }
+
+    // 3. Remove from bookmarks if bookmarked
+    if (model.state.bookmarks.some(b => b.id === model.state.recipe.id)) {
+      model.removeBookmark(model.state.recipe.id);
+    }
+
+    // 4. Update the UI
+    ResultsView.update(model.getSearchResultsPage());
+    BookmarksView.render(model.state.bookmarks);
+
+    // 5. Clear recipe view and show success message
+    RecipeView.renderMessage('Recipe successfully deleted!');
+
+    // 6. Clear URL hash after a short delay
+    setTimeout(() => {
+      window.location.hash = '';
+    }, 1000);
+  } catch (err) {
+    console.error(err);
+    RecipeView.renderError('Could not delete recipe. Please try again!');
+  }
+};
+
 // subscriber
 const init = function () {
   AddRecipeView.addHandlerUpload(controlAddRecipe);
@@ -131,5 +166,6 @@ const init = function () {
   RecipeView.addHandlerBookmark(controlAddBookmark);
   SearchView.addHandlerSearch(controlSearchResults);
   PaginationView.addHandlerPagination(contorlPagination);
+  RecipeView.addHandlerDelete(controlDeleteRecipe);
 };
 init();

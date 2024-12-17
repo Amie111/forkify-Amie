@@ -151,3 +151,24 @@ export const addRecipeUpload = async function (newRecipe) {
     throw err;
   }
 };
+
+// 从API中删除上传过的recipe
+export const deleteRecipe = async function (id) {
+  try {
+    const res = await fetch(`${API_URL}${id}?key=${KEY}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    // Check if request was successful
+    if (!res.ok) {
+      throw new Error(`Failed to delete recipe (${res.status})`);
+    }
+
+    return true;
+  } catch (err) {
+    throw err;
+  }
+};
