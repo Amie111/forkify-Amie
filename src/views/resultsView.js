@@ -22,7 +22,7 @@ class ResultsView extends View {
       <button class ="sort-btn btn--inline" data-sort ="${
         this._data.sortOrder === 'desc' ? 'asc' : 'desc'
       }">
-       Ingredients Count ${this._data.sortOrder === 'desc' ? '⬆️' : '⬇️'}
+       Length of Title ${this._data.sortOrder === 'desc' ? '⬆️' : '⬇️'}
       </button>
     </div>
     <ul class = "results-list">

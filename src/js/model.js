@@ -14,6 +14,7 @@ export const state = {
   bookmarks: [],
 };
 
+////////////////////////////////////////////////////////////////
 const creatRecipedata = function (loaddata) {
   // 将load出来的recipe全部放进state的recipe对象中
   const { recipe } = loaddata.data;
@@ -31,6 +32,7 @@ const creatRecipedata = function (loaddata) {
   };
 };
 
+////////////////////////////////////////////////////////////////
 // 创建一个函数用来给搜索结果默认按照ingredientsCount降序排序，并返回排序后的结果
 export const sortResults = function (
   results = state.search.results,
@@ -44,6 +46,7 @@ export const sortResults = function (
   return sortResults;
 };
 
+////////////////////////////////////////////////////////////////
 // 用id获取recipe的数据，并存储到state对象中的recipe里
 export const loadRecipe = async function (id) {
   try {
@@ -61,6 +64,7 @@ export const loadRecipe = async function (id) {
   }
 };
 
+////////////////////////////////////////////////////////////////
 // 用API查询获取query关键字的数据,返回结果存储到state对象中的search里
 export const loadSearchResults = async function (query) {
   try {
@@ -69,32 +73,30 @@ export const loadSearchResults = async function (query) {
     // 如果搜索出来的结果为空，则扔出一个错误一直传导到界面上
     if (!data || data.results === 0) throw new Error();
 
-    // Load full recipe data to get ingredient counts
-    const recipesWithIngredients = await Promise.all(
-      data.data.recipes.map(async res => {
-        try {
-          const fullRecipe = await AJAX(`${API_URL}${res.id}?key=${KEY}`);
-          return {
-            id: res.id,
-            image: res.image_url,
-            publisher: res.publisher,
-            title: res.title,
-            ...(res.key && { key: res.key }), //同样，搜索时，如果有上传的recipe也把他的key取下来
-            ingredientsCount: fullRecipe.data.recipe.ingredients.length,
-          };
-        } catch (err) {
-          throw err;
-        }
-      })
-    );
-    state.search.results = sortResults(recipesWithIngredients, 'desc');
+    //直接使用搜索结果，不额外请求每个配方的详细信息
+    state.search.results = data.data.recipes.map(res => ({
+      id: res.id,
+      image: res.image_url,
+      publisher: res.publisher,
+      title: res.title,
+      ...(res.key && { key: res.key }), //同样，搜索时，如果有上传的recipe也把他的key取下来
+    }));
+
     state.search.page = 1;
     state.search.sortOrder = 'desc';
+
+    // 使用标题属性降序排序
+    if (state.search.sortOrder === 'desc') {
+      state.search.results.sort((a, b) => b.title.localeCompare(a.title));
+    } else {
+      state.search.results.sort((a, b) => a.title.localeCompare(b.title));
+    }
   } catch (err) {
     throw err;
   }
 };
 
+////////////////////////////////////////////////////////////////
 // 显示对应页的搜索结果，默认从第一页开始,同时将当前页存储进model.state.search中
 export const getSearchResultsPage = function (page = state.search.page) {
   state.search.page = page;
@@ -104,6 +106,7 @@ export const getSearchResultsPage = function (page = state.search.page) {
   return state.search.results.slice(start, end); //slice不包含end的值，比如想取0～9的值：slice（0，10）
 };
 
+////////////////////////////////////////////////////////////////
 // 用新的serving数和旧的serving数计算对应的ingredients,并将新的servings存储进state里
 export const updateServings = function (newServing) {
   // 更新配料数组中的每一个元素的量
@@ -113,6 +116,7 @@ export const updateServings = function (newServing) {
   state.recipe.servings = newServing;
 };
 
+////////////////////////////////////////////////////////////////
 // 写一个函数用来将state中的bookmarks存储在本地
 const persistBookmarks = function () {
   localStorage.setItem('bookmarks', JSON.stringify(state.bookmarks));
@@ -127,6 +131,7 @@ export const addBookmark = function (recipe) {
   persistBookmarks();
 };
 
+////////////////////////////////////////////////////////////////
 // 删除书签
 export const removeBookmark = function (id) {
   // 通过遍历匹配bookmark中的recipe的id和指定的id
@@ -137,12 +142,14 @@ export const removeBookmark = function (id) {
   persistBookmarks();
 };
 
+////////////////////////////////////////////////////////////////
 const init = function () {
   const storage = localStorage.getItem('bookmarks');
   if (storage) state.bookmarks = JSON.parse(storage);
 };
 init();
 
+////////////////////////////////////////////////////////////////
 // 异步上传：上传从view ——> control接收来的新recipe数据
 export const addRecipeUpload = async function (newRecipe) {
   try {
