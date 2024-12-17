@@ -32,6 +32,14 @@ class RecipeView extends View {
     });
   }
 
+  addHandlerDelete(handler) {
+    this._parentElement.addEventListener('click', function (e) {
+      const btn = e.target.closest('.btn--delete');
+      if (!btn) return;
+      handler();
+    });
+  }
+
   // 生成recipe的html组件
   _generateMarkup() {
     return `
@@ -85,6 +93,7 @@ class RecipeView extends View {
               <use href="${icons}#icon-user"></use>
             </svg>
           </div>
+           
           <button class="btn--round btn--bookmark">
             <svg class="">
               <use href="${icons}#icon-bookmark${
@@ -92,6 +101,17 @@ class RecipeView extends View {
     }"></use>
             </svg>
           </button>
+          ${
+            this._data.key
+              ? `
+             <button class="btn--round btn--delete">
+               <svg>
+                 <use href="${icons}#icon-minus-circle"></use>
+               </svg>
+             </button>
+           `
+              : ''
+          }
         </div>
 
         <div class="recipe__ingredients">

@@ -119,6 +119,27 @@
     }
   }
 
+  // Delete button
+  &__btn--delete {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+
+    svg {
+      height: 2.25rem;
+      width: 2.25rem;
+      fill: $color-primary;
+      transition: all 0.2s;
+
+      &:hover {
+        fill: $color-grad-2;
+        transform: scale(1.1);
+      }
+    }
+  }
   ///////////
   // INGREDIENTS
   &__ingredients {
